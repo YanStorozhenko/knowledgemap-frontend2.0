@@ -18,7 +18,6 @@ module.exports = {
         "hover:text-pink-300",
         "transition-colors",
         "text-lg",
-
         "hidden",
         "md:flex",
         "gap-6",
@@ -26,30 +25,53 @@ module.exports = {
         "justify-center",
         "flex-1",
         "mx-8",
-
         "md:hidden",
         "text-3xl",
         "ml-auto",
-
         "flex",
         "flex-col",
         "items-center",
         "gap-3",
         "pb-4",
         "bg-[#0a0f1f]",
-
         "max-w-7xl",
         "mx-auto",
         "px-4",
         "py-4",
         "justify-between",
         "items-center",
-
         "bg-[#0a0f1f]",
         "shadow-lg",
         "z-10",
-
         "ml-auto"
     ],
     plugins: [require("daisyui")],
-}
+    daisyui: {
+        themes: [
+            {
+                light: {
+                    primary: "#4f46e5",
+                    secondary: "#d1d5db",
+                    accent: "#9333ea",
+                    neutral: "#1f2937",
+                    "base-100": "#ffffff",
+                    "info": "#3abff8",
+                    "success": "#36d399",
+                    "warning": "#fbbd23",
+                    "error": "#f87272",
+                },
+                dark: {
+                    primary: "#22d3ee",
+                    secondary: "#64748b",
+                    accent: "#8b5cf6",
+                    neutral: "#1e293b",
+                    "base-100": "#0f172a",
+                    "info": "#0ca5e9",
+                    "success": "#2dd4bf",
+                    "warning": "#facc15",
+                    "error": "#f87171",
+                },
+            },
+        ],
+    },
+};

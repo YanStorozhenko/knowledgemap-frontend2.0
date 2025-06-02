@@ -1,12 +1,23 @@
 
 import './App.css'
 
-import {Link, Route, Routes} from "react-router-dom";
-import Home from "./pages/Home";
-// import Graph from "./components/Graph/Graph";
+import { Route, Routes} from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar.tsx";
 
-const logoLinkStyle = "flex items-center gap-2 text-xl font-bold text-cyan-300";
+
+import Home from "./pages/Home";
+import Map from "./pages/Map";
+import Topics from "./pages/Topics";
+import Posts from "./pages/Posts";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Progress from "./pages/Progress";
+import Tests from "./pages/Tests";
+import CodeExamples from "./pages/CodeExamples";
+import Glossary from "./pages/Glossary";
+import Favorites from "./pages/Favorites";
+import AdminEditorPage from "./pages/admin/AdminEditorPage.tsx";
+import Login from "./pages/Login";
 
 
 function App() {
@@ -14,20 +25,25 @@ function App() {
   return (
       <div className="min-h-screen flex flex-col bg-gradient-to-tr from-void via-galaxy to-cosmic text-starlight">
 
+
           <Navbar/>
-          {/*Логотип */}
-          <Link to="/" className={logoLinkStyle}>
-              <div>
-                  <img src="/logo.png" className="logo" alt="logo"/>
-              </div>
-          </Link>
-          <h1>Карта знань з основ програмування</h1>
+
 
           <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/map" element={<Map />} />
+              <Route path="/topics" element={<Topics />} />
+              <Route path="/posts" element={<Posts />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/progress" element={<Progress />} />
+              <Route path="/tests" element={<Tests />} />
+              <Route path="/codeExamples" element={<CodeExamples />} />
+              <Route path="/glossary" element={<Glossary />} />
+              <Route path="/favorites" element={<Favorites />} />
 
-
-              <Route path="/" element={<Home/>}/>
-              {/*<Route path="/graph" element={<Graph/>}/>*/}
+              <Route path="/login" element={<Login />} />
+              <Route path="/admin/adminEditorPage" element={<AdminEditorPage />} />
           </Routes>
       </div>
   )
