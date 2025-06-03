@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar/Navbar.tsx";
 
 
 import Home from "./pages/Home";
-import Map from "./pages/Map";
+import Map from "./pages/MapPage.tsx";
 import Topics from "./pages/Topics";
 import Posts from "./pages/Posts";
 import About from "./pages/About";
