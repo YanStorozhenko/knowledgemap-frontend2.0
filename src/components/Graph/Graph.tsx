@@ -30,9 +30,21 @@ export default function Graph({ nodes, edges }: GraphProps) {
         };
 
         const options = {
-            layout: { improvedLayout: true },
-            physics: { enabled: true, stabilization: false },
-            interaction: { hover: true },
+            layout: {
+                hierarchical: {
+                    enabled: true,
+                    direction: 'UD', // напрямок: зверху вниз
+                    sortMethod: 'directed', // сортування за напрямком ребер
+                    nodeSpacing: 150,
+                    levelSeparation: 200,
+                },
+            },
+            physics: {
+                enabled: false, // вимкнення фізичної симуляції
+            },
+            interaction: {
+                hover: true,
+            },
         };
 
         new Network(containerRef.current, data, options);

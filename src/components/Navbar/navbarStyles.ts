@@ -9,3 +9,6 @@ export const mobileNavStyle = "md:hidden flex flex-col items-center gap-3 pb-4 b
 export const headerContainerStyle = "max-w-7xl mx-auto px-4 py-4 flex items-center justify-between";
 export const headerWrapperStyle = "bg-[#0a0f1f] shadow-lg z-10";
 export const titleStyle = "text-3xl md:text-4xl font-bold text-cyan-300 dark:text-cyan-200";
+
+export const userPanelStyle = "flex items-center gap-4 text-cyan-100";
+export const logoutButtonStyle = "bg-pink-300 hover:bg-pink-600 text-white px-4 py-1 rounded";

@@ -32,17 +32,19 @@ export default function MapPage() {
                     }),
                 ]);
 
-                const nodesData = await nodesRes.json();
-                const edgesData = await edgesRes.json();
+                const rawNodes = await nodesRes.json();
+                const rawEdges = await edgesRes.json();
 
-                setNodes(nodesData);
-                setEdges(
-                    edgesData.map((edge: any) => ({
-                        from: edge.from_node_id,
-                        to: edge.to_node_id,
-                        label: edge.type,
-                    }))
-                );
+                const mappedEdges = rawEdges.map((edge: any) => ({
+                    from: edge.from_node_id,
+                    to: edge.to_node_id,
+                    label: edge.type,
+                }));
+
+                const rankedNodes = assignLevels(rawNodes, mappedEdges);
+
+                setNodes(rankedNodes);
+                setEdges(mappedEdges);
             } catch (err) {
                 console.error("Помилка при завантаженні графу:", err);
             } finally {
@@ -69,4 +71,50 @@ export default function MapPage() {
             </div>
         </div>
     );
+}
+
+// 🔧 Допоміжна функція для обчислення рівнів вузлів
+function assignLevels(
+    nodes: NodeData[],
+    edges: EdgeData[]
+): (NodeData & { level: number })[] {
+    const inDegree = new Map<number, number>();
+    const graph = new Map<number, number[]>();
+
+    nodes.forEach(node => {
+        inDegree.set(node.id, 0);
+        graph.set(node.id, []);
+    });
+
+    edges.forEach(edge => {
+        graph.get(edge.from)?.push(edge.to);
+        inDegree.set(edge.to, (inDegree.get(edge.to) || 0) + 1);
+    });
+
+    const queue: { id: number; level: number }[] = [];
+    const levels = new Map<number, number>();
+
+    inDegree.forEach((deg, id) => {
+        if (deg === 0) {
+            queue.push({ id, level: 0 });
+            levels.set(id, 0);
+        }
+    });
+
+    while (queue.length > 0) {
+        const { id, level } = queue.shift()!;
+        for (const neighbor of graph.get(id)!) {
+            inDegree.set(neighbor, inDegree.get(neighbor)! - 1);
+            if (inDegree.get(neighbor) === 0) {
+                const newLevel = level + 1;
+                queue.push({ id: neighbor, level: newLevel });
+                levels.set(neighbor, newLevel);
+            }
+        }
+    }
+
+    return nodes.map(node => ({
+        ...node,
+        level: levels.get(node.id) ?? 0,
+    }));
 }

@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-
 import { useEffect, useState } from "react";
-import { auth } from "../../firebase";
+import { auth, googleProvider } from "../../firebase";
+
+import {signInWithPopup, type User} from "firebase/auth";
+
+
 import {
     linkStyle,
     logoLinkStyle,
@@ -13,10 +16,9 @@ import {
     headerContainerStyle,
     headerWrapperStyle,
     titleStyle,
+    userPanelStyle,
+    logoutButtonStyle
 } from "./navbarStyles";
-
-// import { useAuth } from "../../context/AuthContext";
-// import UserPanel from "../UserPanel/UserPanel";
 
 export const navLinks = [
     // 🔹 Доступне всім користувачам
@@ -38,33 +40,93 @@ export const navLinks = [
     { path: "/admin/adminEditorPage", label: "Адмін", adminOnly: true },
 ];
 
-
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [user, setUser] = useState <User | null>(null);
 
-    const [user, setUser] = useState(null);
+    const [role, setRole] = useState(null);
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(currentUser => {
+        const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             if (currentUser) {
-                console.log("👤 Користувач авторизований:", currentUser);
+                console.log("👤 Користувач авторизований:", currentUser.displayName);
+
                 setUser(currentUser);
+                const token = await currentUser.getIdToken();
+                localStorage.setItem("token", token);
+
+                // 🔁 Отримуємо роль
+                const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/users/me", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setRole(data.role);
+                    localStorage.setItem("role", data.role);
+                }
             } else {
                 console.log("❌ Користувач не авторизований");
                 setUser(null);
+                setRole(null);
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
             }
         });
 
         return () => unsubscribe();
     }, []);
 
+    const handleGoogleLogin = async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const token = await result.user.getIdToken();
+
+            // 🔐 Зберігаємо токен
+            localStorage.setItem("token", token);
+
+            // 🧠 Зберігаємо користувача в БД
+            await fetch(import.meta.env.VITE_API_BASE_URL + "/users/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    firebase_uid: result.user.uid,
+                    email: result.user.email,
+                    name: result.user.displayName,
+                    avatarUrl: result.user.photoURL,
+                }),
+            });
+
+            // 🔁 Отримуємо роль
+            const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/users/me", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setRole(data.role);
+                setUser(result.user);
+                localStorage.setItem("role", data.role);
+            }
+        } catch (err) {
+            console.error("Помилка входу:", err);
+        }
+    };
+
+    const isLoggedIn = !!user;
+    const isAdmin = role === "admin";
 
 
-    // const { user, role, loading } = useAuth();
-    // const isLoggedIn = !!user;
-    // const isAdmin = role === "admin";
-
-    // if (loading) return null;
+    const filteredLinks = navLinks.filter(link => {
+        if (link.adminOnly) return isAdmin;
+        if (link.authOnly) return isLoggedIn;
+        return true;
+    });
 
     return (
         <header className={headerWrapperStyle}>
@@ -76,16 +138,40 @@ export default function Navbar() {
                 </Link>
                 <h1 className={titleStyle}>Карта знань з основ програмування</h1>
                 {user ? (
-                    <p>Привіт, {user.displayName}</p>
+                    <div className={userPanelStyle}>
+
+                        <p>Привіт, {user.displayName?.toString().split(' ')[0] || user.email}
+                        </p>
+                        <p>{localStorage.getItem("role")} </p>
+
+                        <button
+                            className={logoutButtonStyle}
+                            onClick={async () => {
+                                await auth.signOut();
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("role");
+                            }}
+                        >
+                            Вийти
+                        </button>
+                    </div>
                 ) : (
-                    <p>Будь ласка, увійдіть</p>
+                    <div className={userPanelStyle}>
+                        <p>Будь ласка, увійдіть</p>
+                        <button
+                            className="btn btn-primary"
+                            onClick={handleGoogleLogin}
+                        >
+                            Увійти через Google
+                        </button>
+                    </div>
                 )}
             </div>
 
             <div className={headerContainerStyle}>
                 {/* Навігація десктоп */}
                 <nav className={navContainerStyle}>
-                    {navLinks.map(({ path, label }) => (
+                    {filteredLinks.map(({ path, label }) => (
                         <Link key={path} to={path} className={linkStyle}>
                             {label}
                         </Link>
@@ -111,7 +197,7 @@ export default function Navbar() {
             {/* Мобільне меню */}
             {isOpen && (
                 <nav className={mobileNavStyle}>
-                    {navLinks.map(({ path, label }) => (
+                    {filteredLinks.map(({ path, label }) => (
                         <Link
                             key={path}
                             to={path}
@@ -131,3 +217,4 @@ export default function Navbar() {
         </header>
     );
 }
+
