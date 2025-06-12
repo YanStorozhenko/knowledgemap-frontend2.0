@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import Graph from "../components/Graph/Graph";
 import SidebarNodes from "../components/SidebarNodes/SidebarNodes";
 import type { NodeData, EdgeData } from "../components/Graph/Graph";
+import NodeInfoPanel from "../components/NodeInfoPanel/NodeInfoPanel";
+
+
 
 import {
     header,
@@ -30,6 +33,8 @@ export default function MapPage() {
 
                 const data = await res.json();
 
+
+
                 // Мапимо, щоб у кожного вузла точно був label
                 const formattedNodes = data.nodes.map((node: any) => ({
                     ...node,
@@ -37,7 +42,10 @@ export default function MapPage() {
                 }));
 
                 setNodes(formattedNodes);
-                setEdges(data.edges);
+
+                const formattedEdges = data.edges.map(({ from, to }: EdgeData) => ({ from, to }));
+                setEdges(formattedEdges);
+                // setEdges(data.edges);
             } catch (err) {
                 console.error("Помилка при завантаженні графу:", err);
             } finally {
@@ -48,6 +56,10 @@ export default function MapPage() {
         fetchData();
     }, []);
 
+
+    const activeNode = nodes.find((n) => n.id === activeNodeId) ?? null;
+
+
     return (
         <div className="flex min-h-screen">
             <SidebarNodes
@@ -55,29 +67,35 @@ export default function MapPage() {
                 activeNodeId={activeNodeId}
                 onSidebarNodeClick={(id) => {
                     setActiveNodeId(id);
-                    // Викликаємо функцію фокусування вузла в графі
                     window.__focusGraphNode?.(id);
                 }}
             />
+
             <div className="flex-1 flex flex-col">
                 <div className={header}>
                     <h1 className={title}>Інтерактивна карта знань</h1>
                     <p className={subtitle}>Натисніть на вузли для вивчення тем</p>
                 </div>
-                <div className={graphArea}>
-                    {loading ? (
-                        <div className={loadingText}>Завантаження графу...</div>
-                    ) : (
-                        <Graph
-                            nodes={nodes}
-                            edges={edges}
-                            onNodeClick={(id) => {
-                                setActiveNodeId(id);
-                            }}
-                        />
-                    )}
+                <div className="flex flex-1 overflow-hidden">
+                    <div className={graphArea}>
+                        {loading ? (
+                            <div className={loadingText}>Завантаження графу...</div>
+                        ) : (
+                            <Graph
+                                nodes={nodes}
+                                edges={edges}
+                                onNodeClick={(id) => {
+                                    setActiveNodeId(id);
+                                }}
+                            />
+                        )}
+                    </div>
+
+                    {/* 🔹 Панель справа */}
+                    <NodeInfoPanel node={activeNode}/>
                 </div>
             </div>
         </div>
+
     );
 }

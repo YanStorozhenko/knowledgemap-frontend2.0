@@ -4,13 +4,14 @@ import { Network, DataSet } from 'vis-network/standalone';
 export interface NodeData {
     id: number;
     label: string;
+    title: string;
     color?: string;
 }
 
 export interface EdgeData {
     from: number;
     to: number;
-    label?: string;
+   // label?: string;
 }
 
 interface GraphProps {
@@ -32,6 +33,7 @@ export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
             nodes: new DataSet(nodes),
             edges: new DataSet(edges),
         };
+
 
         const options = {
             layout: {
@@ -93,11 +95,15 @@ export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
             if (!networkRef.current) return;
             networkRef.current.selectNodes([id]);
             networkRef.current.focus(id, {
-                scale: 1.8,
-                animation: { duration: 500 },
+                scale: 3.8,
+                animation: {
+                    duration: 500,
+                    easingFunction: "easeInOutQuad",
+                },
             });
         };
-    }, [nodes, edges, onNodeClick]);
+    }, [nodes, edges]);
+    //}, [nodes, edges, onNodeClick]);
 
     return <div ref={containerRef} style={{ height: '100vh', width: '100%' }} />;
 }
