@@ -17,13 +17,15 @@ export default function SidebarNodes({
                                      }: SidebarNodesProps) {
     const [focusedId, setFocusedId] = useState<number | null>(activeNodeId);
 
-    // Коли ззовні приходить зміна activeNodeId (натиск у графі), оновлюємо локальний стан
     useEffect(() => {
         setFocusedId(activeNodeId ?? null);
     }, [activeNodeId]);
 
-    // Згрупуємо вузли за рівнем
-    const grouped = nodes.reduce((acc, node) => {
+    // Фільтруємо тільки вузли з числовим level
+    const validNodes = nodes.filter((n) => typeof n.level === "number");
+
+    // Групуємо вузли за level
+    const grouped = validNodes.reduce((acc, node) => {
         if (!acc[node.level]) acc[node.level] = [];
         acc[node.level].push(node);
         return acc;
@@ -39,22 +41,27 @@ export default function SidebarNodes({
             {sortedLevels.map((level) => (
                 <div key={level} className="mb-4">
                     <h3 className="text-lg font-semibold mb-2">Рівень {level}</h3>
-                    <ul className="ml-4 list-disc list-inside text-sm space-y-1">
+                    <ul className="ml-4 list-inside text-sm space-y-1">
                         {grouped[level].map((node) => {
                             const isActive = node.id === focusedId;
+
+                            let colorClass = "text-base-content";
+                            if (node.status === "completed") colorClass = "text-blue-400";
+                            else if (node.status === "available") colorClass = "text-green-500";
+                            else if (node.status === "locked") colorClass = "text-gray-400";
+
+                            const finalClass = `cursor-pointer ${colorClass} ${
+                                isActive ? "font-bold underline" : ""
+                            }`;
+
                             return (
                                 <li
                                     key={node.id}
-                                    className={`cursor-pointer ${
-                                        isActive
-                                            ? "text-primary font-semibold"
-                                            : "text-base-content"
-                                    }`}
+                                    className={finalClass}
                                     onClick={() => {
-                                        // 1) Оновлюємо локальний стан (підсвітка у Sidebar)
                                         setFocusedId(node.id);
-                                        // 2) Викликаємо колбек батькові, щоб фокуснути вузол у Graph
-                                        onSidebarNodeClick && onSidebarNodeClick(node.id);
+                                        onSidebarNodeClick?.(node.id);
+                                        localStorage.setItem("lastFocusedNodeId", node.id.toString());
                                     }}
                                 >
                                     {node.title}

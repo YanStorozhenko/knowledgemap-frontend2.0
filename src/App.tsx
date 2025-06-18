@@ -16,8 +16,8 @@ import Tests from "./pages/Tests";
 import CodeExamples from "./pages/CodeExamples";
 import Glossary from "./pages/Glossary";
 import Favorites from "./pages/Favorites";
-import AdminEditorPage from "./pages/admin/AdminEditorPage.tsx";
 import Login from "./pages/Login";
+import AdminPage from "./pages/admin/AdminPage.tsx";
 
 
 function App() {
@@ -43,7 +43,7 @@ function App() {
               <Route path="/favorites" element={<Favorites />} />
 
               <Route path="/login" element={<Login />} />
-              <Route path="/admin/adminEditorPage" element={<AdminEditorPage />} />
+              <Route path="/admin/adminPage" element={<AdminPage />} />
           </Routes>
       </div>
   )

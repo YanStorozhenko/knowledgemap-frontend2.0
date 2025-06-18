@@ -144,7 +144,6 @@ export default function AdminPage() {
 
             <section>
                 <h2 className={sectionTitleStyle}>Пошук вузлів</h2>
-                asfopikhnsissskssssssskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskskss
                 <input
                     type="text"
                     className={inputStyle}
@@ -183,27 +182,44 @@ export default function AdminPage() {
 
             <section>
                 <h2 className={sectionTitleStyle}>Зв’язки</h2>
-                <div className={tableContainerStyle}>
-                    <table className={tableStyle}>
+                <div className="overflow-x-auto">
+                    <table className="table w-full">
                         <thead>
                         <tr>
                             <th>Від</th>
                             <th>До</th>
-                            <th>Тип</th>
+                            <th>Назва вузла</th>
+                            <th>Дії</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {connections.map((c) => (
-                            <tr key={`${c.fromNodeId}-${c.toNodeId}`}>
-                                <td>{c.fromNodeId}</td>
-                                <td>{c.toNodeId}</td>
-                                <td>{c.type}</td>
-                            </tr>
-                        ))}
+                        {connections
+                            .filter(
+                                (c) =>
+                                    filteredNodes.some((n) => n.id === c.fromNodeId) ||
+                                    filteredNodes.some((n) => n.id === c.toNodeId)
+                            )
+                            .map((c) => {
+                                const fromNode = nodes.find((n) => n.id === c.fromNodeId);
+                                const toNode = nodes.find((n) => n.id === c.toNodeId);
+                                return (
+                                    <tr key={`${c.fromNodeId}-${c.toNodeId}`}>
+                                        <td>{c.fromNodeId} — {fromNode?.title || '—'}</td>
+                                        <td>{c.toNodeId}</td>
+                                        <td>{toNode?.title || '—'}</td>
+                                        <td>
+                                            <button className="btn btn-sm btn-info mr-2">Редагувати</button>
+                                            <button className="btn btn-sm btn-error">Видалити</button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
             </section>
+
+
         </div>
     );
 }

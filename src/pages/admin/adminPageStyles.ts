@@ -1,0 +1,9 @@
+export const containerStyle = "p-6 space-y-8";
+export const titleStyle = "text-3xl font-bold text-primary";
+export const sectionTitleStyle = "text-xl font-semibold mb-2";
+export const tableContainerStyle = "overflow-x-auto";
+export const tableStyle = "table w-full";
+export const buttonEditStyle = "btn btn-sm btn-info mr-2";
+export const buttonDeleteStyle = "btn btn-sm btn-error";
+export const inputStyle = "input input-bordered w-full max-w-xs mb-4";
+export const selectStyle = "select select-bordered w-full max-w-xs";

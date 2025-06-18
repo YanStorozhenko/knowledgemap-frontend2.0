@@ -23,21 +23,22 @@ import {
 export const navLinks = [
     // 🔹 Доступне всім користувачам
     { path: "/", label: "Головна" },
-    { path: "/map", label: "Карта знань" },
+
     { path: "/topics", label: "Теми" },
     { path: "/posts", label: "Пости" },
     { path: "/about", label: "Про нас" },
     { path: "/contact", label: "Контакти" },
 
     // 🔒 Тільки для зареєстрованих користувачів
+    { path: "/map", label: "Карта знань", authOnly: true  },
     { path: "/progress", label: "Прогрес", authOnly: true },
     { path: "/tests", label: "Тести", authOnly: true },
     { path: "/codeExamples", label: "Приклади коду", authOnly: true },
     { path: "/glossary", label: "Словник термінів", authOnly: true },
-    { path: "/favorites", label: "Улюблене", authOnly: true },
+    // { path: "/favorites", label: "Улюблене", authOnly: true },
 
     // 🛠️ Адмін-панель (тільки для адміністраторів)
-    { path: "/admin/adminEditorPage", label: "Адмін", adminOnly: true },
+    { path: "/admin/adminPage", label: "Адмін", adminOnly: true },
 ];
 
 export default function Navbar() {
@@ -49,7 +50,7 @@ export default function Navbar() {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             if (currentUser) {
-                console.log("👤 Користувач авторизований:", currentUser.displayName);
+
 
                 setUser(currentUser);
                 const token = await currentUser.getIdToken();
@@ -112,6 +113,8 @@ export default function Navbar() {
                 setRole(data.role);
                 setUser(result.user);
                 localStorage.setItem("role", data.role);
+                localStorage.setItem("firebaseUser", JSON.stringify(result.user));
+
             }
         } catch (err) {
             console.error("Помилка входу:", err);
@@ -130,7 +133,7 @@ export default function Navbar() {
 
     return (
         <header className={headerWrapperStyle}>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 justify-between  px-4">
                 <Link to="/" className={logoLinkStyle}>
                     <div>
                         <img src="/logo.png" className="logo" alt="logo" />

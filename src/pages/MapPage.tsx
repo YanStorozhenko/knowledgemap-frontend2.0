@@ -20,7 +20,11 @@ export default function MapPage() {
     const [nodes, setNodes] = useState<(NodeData & { level: number })[]>([]);
     const [edges, setEdges] = useState<EdgeData[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeNodeId, setActiveNodeId] = useState<number | null>(null); // 🔹 Для підсвітки вибраного вузла
+    const [activeNodeId, setActiveNodeId] = useState<number | null>(null); //  Для підсвітки вибраного вузла
+    const [refresh, setRefresh] = useState(0);
+
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,6 +37,17 @@ export default function MapPage() {
 
                 const data = await res.json();
 
+            console.log(data);
+
+                if (localStorage.getItem("lastFocusedNodeId")) {
+                    setTimeout(() => {
+                        window.__focusGraphNode?.(Number(localStorage.getItem("lastFocusedNodeId")));
+                    }, 300);
+                }
+
+
+
+
 
 
                 // Мапимо, щоб у кожного вузла точно був label
@@ -42,9 +57,15 @@ export default function MapPage() {
                 }));
 
                 setNodes(formattedNodes);
+                console.log("📦 Оновлені вузли:", formattedNodes.map((n: { id: number; status: string }) => [n.id, n.status])
+                );
+
+
 
                 const formattedEdges = data.edges.map(({ from, to }: EdgeData) => ({ from, to }));
                 setEdges(formattedEdges);
+
+                setLoading(false);
                 // setEdges(data.edges);
             } catch (err) {
                 console.error("Помилка при завантаженні графу:", err);
@@ -53,11 +74,15 @@ export default function MapPage() {
             }
         };
 
+
+        console.log( "refresh" +  localStorage.getItem("lastFocusedNodeId"));
         fetchData();
-    }, []);
 
 
-    const activeNode = nodes.find((n) => n.id === activeNodeId) ?? null;
+    }, [refresh]);
+
+
+//const activeNode = nodes.find((n) => n.id === activeNodeId) ?? null;
 
 
     return (
@@ -84,15 +109,18 @@ export default function MapPage() {
                             <Graph
                                 nodes={nodes}
                                 edges={edges}
-                                onNodeClick={(id) => {
-                                    setActiveNodeId(id);
-                                }}
+                                onNodeClick={(id) => setActiveNodeId(id)}
+                                activeNodeId={activeNodeId}
                             />
                         )}
                     </div>
 
-                    {/* 🔹 Панель справа */}
-                    <NodeInfoPanel node={activeNode}/>
+                    {/* Панель праворуч */}
+                    <NodeInfoPanel
+                        key={activeNodeId + '-' + refresh}
+                        node={nodes.find(n => n.id === activeNodeId) || null}
+                        onProgressUpdate={() => setRefresh(r => r + 1)}
+                    />
                 </div>
             </div>
         </div>

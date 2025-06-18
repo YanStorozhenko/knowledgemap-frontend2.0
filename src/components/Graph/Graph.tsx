@@ -1,24 +1,33 @@
 import { useEffect, useRef } from 'react';
 import { Network, DataSet } from 'vis-network/standalone';
 
+
+
+ console.log(localStorage.getItem("lastFocusedNodeId"));
+
 export interface NodeData {
     id: number;
     label: string;
     title: string;
-    color?: string;
+    topicId: number;
+    x: number | null;
+    y: number | null;
+    level: number;
+    progress: number;
+    status: 'completed' | 'available' | 'locked';
 }
+
 
 export interface EdgeData {
     from: number;
     to: number;
-   // label?: string;
 }
 
 interface GraphProps {
     nodes: NodeData[];
     edges: EdgeData[];
-    /** Ця функція буде викликатися щоразу, коли користувач клікає на вузол графа */
     onNodeClick?: (nodeId: number) => void;
+    activeNodeId?: number | null;
 }
 
 export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
@@ -28,21 +37,38 @@ export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
     useEffect(() => {
         if (!containerRef.current) return;
 
-        // Підготувати дані для vis-network
+        // 💡 Мапимо кольори на основі progressStatus
+        const coloredNodes = nodes.map((node) => {
+            let color = '#888888'; // default (locked)
+
+            if (node.status === 'completed') color = '#3B82F6'; // blue
+            else if (node.status === 'available') color = '#10B981'; // green
+
+            return {
+                ...node,
+                color: { background: color },
+            };
+
+        });
+
         const data = {
-            nodes: new DataSet(nodes),
+            nodes: new DataSet(coloredNodes),
             edges: new DataSet(edges),
         };
+
+
+        // const nodeSpacingRand =  12 + (Math.random() * 8 - 4);
+        // const levelSeparationRand =  70 + (Math.random() * 40 - 20);
 
 
         const options = {
             layout: {
                 hierarchical: {
                     enabled: true,
-                    direction: 'UD',       // зверху вниз
-                    sortMethod: 'directed',// сортування за напрямком
-                    nodeSpacing: 150,
-                    levelSeparation: 200,
+                    direction: 'LR',
+                    sortMethod: 'directed',
+                    nodeSpacing: 40,
+                    levelSeparation: 150,
                 },
             },
             nodes: {
@@ -50,7 +76,7 @@ export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
                 size: 20,
                 font: {
                     size: 14,
-                    color: '#ffffff',
+                    color: '#00ffff',
                 },
             },
             edges: {
@@ -71,31 +97,30 @@ export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
             },
         };
 
-        // Якщо раніше вже був створений граф — видалимо його
         if (networkRef.current) {
             networkRef.current.destroy();
             networkRef.current = null;
         }
 
-        // Створюємо новий Network
         networkRef.current = new Network(containerRef.current, data, options);
 
-        // Якщо передано колбек onNodeClick — підписуємося на подію 'click'
         if (onNodeClick && networkRef.current) {
             networkRef.current.on('click', (params) => {
                 if (params.nodes.length > 0) {
                     const clickedId = params.nodes[0] as number;
                     onNodeClick(clickedId);
+                    localStorage.setItem("lastFocusedNodeId", clickedId.toString());
+                    console.log( nodes[clickedId].status);
                 }
+
             });
         }
 
-        // Експортуємо віконну функцію, щоб можна було фокусувати вузол зовні (наприклад із Sidebar)
         window.__focusGraphNode = (id: number) => {
             if (!networkRef.current) return;
             networkRef.current.selectNodes([id]);
             networkRef.current.focus(id, {
-                scale: 3.8,
+                scale: 1,
                 animation: {
                     duration: 500,
                     easingFunction: "easeInOutQuad",
@@ -103,15 +128,12 @@ export default function Graph({ nodes, edges, onNodeClick }: GraphProps) {
             });
         };
     }, [nodes, edges]);
-    //}, [nodes, edges, onNodeClick]);
 
     return <div ref={containerRef} style={{ height: '100vh', width: '100%' }} />;
 }
 
-// Додаємо оголошення у глобальний тип Window
 declare global {
     interface Window {
-        /** Викликає фокусування (select + focus) відповідного вузла у графі */
         __focusGraphNode?: (id: number) => void;
     }
 }
