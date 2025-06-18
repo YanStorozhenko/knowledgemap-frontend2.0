@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, googleProvider } from "../../firebase";
-
-import {signInWithPopup, type User} from "firebase/auth";
-
+import { signInWithPopup, type User } from "firebase/auth";
 
 import {
     linkStyle,
@@ -16,51 +14,39 @@ import {
     headerContainerStyle,
     headerWrapperStyle,
     titleStyle,
-    userPanelStyle,
-    logoutButtonStyle
+    logoutButtonStyle,
+    userInfoWrapperStyle,
+    userInfoTextStyle,
 } from "./navbarStyles";
 
 export const navLinks = [
-    // 🔹 Доступне всім користувачам
     { path: "/", label: "Головна" },
-
     { path: "/topics", label: "Теми" },
     { path: "/posts", label: "Пости" },
     { path: "/about", label: "Про нас" },
     { path: "/contact", label: "Контакти" },
-
-    // 🔒 Тільки для зареєстрованих користувачів
-    { path: "/map", label: "Карта знань", authOnly: true  },
+    { path: "/map", label: "Карта знань", authOnly: true },
     { path: "/progress", label: "Прогрес", authOnly: true },
     { path: "/tests", label: "Тести", authOnly: true },
     { path: "/codeExamples", label: "Приклади коду", authOnly: true },
     { path: "/glossary", label: "Словник термінів", authOnly: true },
-    // { path: "/favorites", label: "Улюблене", authOnly: true },
-
-    // 🛠️ Адмін-панель (тільки для адміністраторів)
     { path: "/admin/adminPage", label: "Адмін", adminOnly: true },
 ];
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const [user, setUser] = useState <User | null>(null);
-
-    const [role, setRole] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [role, setRole] = useState<string | null>(null);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
             if (currentUser) {
-
-
                 setUser(currentUser);
                 const token = await currentUser.getIdToken();
                 localStorage.setItem("token", token);
 
-                // 🔁 Отримуємо роль
                 const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/users/me", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 if (res.ok) {
                     const data = await res.json();
@@ -68,7 +54,6 @@ export default function Navbar() {
                     localStorage.setItem("role", data.role);
                 }
             } else {
-                console.log("❌ Користувач не авторизований");
                 setUser(null);
                 setRole(null);
                 localStorage.removeItem("token");
@@ -83,11 +68,8 @@ export default function Navbar() {
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const token = await result.user.getIdToken();
-
-            // 🔐 Зберігаємо токен
             localStorage.setItem("token", token);
 
-            // 🧠 Зберігаємо користувача в БД
             await fetch(import.meta.env.VITE_API_BASE_URL + "/users/save", {
                 method: "POST",
                 headers: {
@@ -102,11 +84,8 @@ export default function Navbar() {
                 }),
             });
 
-            // 🔁 Отримуємо роль
             const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/users/me", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
             if (res.ok) {
                 const data = await res.json();
@@ -114,7 +93,6 @@ export default function Navbar() {
                 setUser(result.user);
                 localStorage.setItem("role", data.role);
                 localStorage.setItem("firebaseUser", JSON.stringify(result.user));
-
             }
         } catch (err) {
             console.error("Помилка входу:", err);
@@ -124,7 +102,6 @@ export default function Navbar() {
     const isLoggedIn = !!user;
     const isAdmin = role === "admin";
 
-
     const filteredLinks = navLinks.filter(link => {
         if (link.adminOnly) return isAdmin;
         if (link.authOnly) return isLoggedIn;
@@ -133,20 +110,18 @@ export default function Navbar() {
 
     return (
         <header className={headerWrapperStyle}>
-            <div className="flex items-center gap-4 justify-between  px-4">
-                <Link to="/" className={logoLinkStyle}>
-                    <div>
+            <div className="flex flex-col sm:flex-row items-center justify-between px-4 gap-2">
+                <div className="flex items-center gap-4">
+                    <Link to="/" className={logoLinkStyle}>
                         <img src="/logo.png" className="logo" alt="logo" />
-                    </div>
-                </Link>
-                <h1 className={titleStyle}>Карта знань з основ програмування</h1>
+                    </Link>
+                    <h1 className={titleStyle}>Карта знань з основ програмування</h1>
+                </div>
+
                 {user ? (
-                    <div className={userPanelStyle}>
-
-                        <p>Привіт, {user.displayName?.toString().split(' ')[0] || user.email}
-                        </p>
-                        <p>{localStorage.getItem("role")} </p>
-
+                    <div className={userInfoWrapperStyle}>
+                        <p className={userInfoTextStyle}>Привіт, {user.displayName?.split(" ")[0] || user.email}</p>
+                        <p className={userInfoTextStyle}>{role}</p>
                         <button
                             className={logoutButtonStyle}
                             onClick={async () => {
@@ -159,12 +134,9 @@ export default function Navbar() {
                         </button>
                     </div>
                 ) : (
-                    <div className={userPanelStyle}>
-                        <p>Будь ласка, увійдіть</p>
-                        <button
-                            className="btn btn-primary"
-                            onClick={handleGoogleLogin}
-                        >
+                    <div className={userInfoWrapperStyle}>
+                        <p className={userInfoTextStyle}>Будь ласка, увійдіть</p>
+                        <button className="btn btn-primary" onClick={handleGoogleLogin}>
                             Увійти через Google
                         </button>
                     </div>
@@ -172,32 +144,21 @@ export default function Navbar() {
             </div>
 
             <div className={headerContainerStyle}>
-                {/* Навігація десктоп */}
                 <nav className={navContainerStyle}>
                     {filteredLinks.map(({ path, label }) => (
                         <Link key={path} to={path} className={linkStyle}>
                             {label}
                         </Link>
                     ))}
-                    {/* {isLoggedIn && <Link to="/favorites" className={linkStyle}>Улюблене</Link>} */}
-                    {/* {isAdmin && <Link to="/admin/adminEditorPage" className="text-orange-400 font-semibold hover:text-orange-300">Адмін</Link>} */}
                 </nav>
 
-                {/* Панель користувача справа */}
-                <div className={desktopUserPanelStyle}>
-                    {/* <UserPanel /> */}
-                </div>
+                <div className={desktopUserPanelStyle} />
 
-                {/* Бургер */}
-                <button
-                    className={burgerButtonStyle}
-                    onClick={() => setIsOpen(!isOpen)}
-                >
+                <button className={burgerButtonStyle} onClick={() => setIsOpen(!isOpen)}>
                     ☰
                 </button>
             </div>
 
-            {/* Мобільне меню */}
             {isOpen && (
                 <nav className={mobileNavStyle}>
                     {filteredLinks.map(({ path, label }) => (
@@ -210,14 +171,8 @@ export default function Navbar() {
                             {label}
                         </Link>
                     ))}
-                    {/* {isLoggedIn && <Link to="/favorites" onClick={() => setIsOpen(false)} className={mobileLinkStyle}>Улюблене</Link>} */}
-                    {/* {isAdmin && <Link to="/admin/adminEditorPage" onClick={() => setIsOpen(false)} className="text-orange-400 font-semibold">Адмін</Link>} */}
-                    <div className="mt-4">
-                        {/* <UserPanel /> */}
-                    </div>
                 </nav>
             )}
         </header>
     );
 }
-

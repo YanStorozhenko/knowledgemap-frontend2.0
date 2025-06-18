@@ -47,9 +47,6 @@ export default function MapPage() {
 
 
 
-
-
-
                 // Мапимо, щоб у кожного вузла точно був label
                 const formattedNodes = data.nodes.map((node: any) => ({
                     ...node,
@@ -57,7 +54,12 @@ export default function MapPage() {
                 }));
 
                 setNodes(formattedNodes);
+
+
+
                 console.log("📦 Оновлені вузли:", formattedNodes.map((n: { id: number; status: string }) => [n.id, n.status])
+
+
                 );
 
 

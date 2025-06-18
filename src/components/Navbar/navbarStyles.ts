@@ -1,15 +1,18 @@
-export const linkStyle = "text-cyan-200 hover:text-pink-300 transition-colors";
-export const logoLinkStyle = "flex items-center gap-2 text-xl font-bold text-cyan-300";
-export const mobileLinkStyle = `${linkStyle} text-lg`;
+// src/components/Navbar/navbarStyles.ts
 
-export const navContainerStyle = "hidden md:flex gap-6 flex-wrap justify-between flex-1 mx-8";
-export const burgerButtonStyle = "md:hidden text-cyan-200 text-3xl ml-auto";
-export const desktopUserPanelStyle = "hidden md:block ml-auto";
-export const mobileNavStyle = "md:hidden flex flex-col items-center gap-3 pb-4 bg-[#0a0f1f]";
-export const headerContainerStyle = "max-w-7xl mx-auto px-4 py-4 flex items-center justify-between";
-export const headerWrapperStyle = "bg-[#0a0f1f] shadow-lg z-10 justify-between";
-export const titleStyle = "text-3xl md:text-4xl font-bold text-cyan-300 dark:text-cyan-200";
+export const linkStyle = "text-sm font-medium text-primary hover:text-secondary";
+export const logoLinkStyle = "flex items-center gap-2";
+export const mobileLinkStyle = "block py-2 text-sm text-primary hover:text-secondary";
+export const navContainerStyle = "hidden md:flex gap-4 items-center";
+export const burgerButtonStyle = "md:hidden text-2xl text-primary ml-4";
+export const desktopUserPanelStyle = "hidden md:block";
+export const mobileNavStyle = "md:hidden flex flex-col gap-2 p-4 bg-base-200 rounded-lg mt-2";
+export const headerContainerStyle = "flex items-center justify-between px-4 py-2";
+export const headerWrapperStyle = "bg-base-100 shadow";
+export const titleStyle = "text-lg font-bold text-primary";
+export const logoutButtonStyle = "btn btn-sm bg-pink-400 hover:bg-pink-500 text-white";
 
-export const userPanelStyle = "flex flex-col items-end gap-4 text-cyan-100";
-
-export const logoutButtonStyle = "bg-pink-300 hover:bg-pink-600 text-white px-4 py-1 rounded";
+// 🔧 Нові стилі для адаптивного блоку користувача
+export const userInfoTextStyle = "text-xs sm:text-sm leading-tight text-right whitespace-nowrap truncate max-w-[150px]";
+export const userInfoWrapperStyle =
+    "flex items-center gap-2 text-sm whitespace-nowrap max-w-xs truncate flex-col sm:flex-row sm:items-center";
