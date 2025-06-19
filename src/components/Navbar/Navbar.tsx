@@ -135,7 +135,7 @@ export default function Navbar() {
                     </div>
                 ) : (
                     <div className={userInfoWrapperStyle}>
-                        <p className={userInfoTextStyle}>Будь ласка, увійдіть</p>
+
                         <button className="btn btn-primary" onClick={handleGoogleLogin}>
                             Увійти через Google
                         </button>

@@ -8,27 +8,11 @@ export default function Login() {
     const handleGoogleLogin = async () => {
         try {
             const result = await signInWithPopup(auth, googleProvider);
-            const token = await result.user.getIdToken();
 
-            // 🔐 Зберігаємо токен
+            const token = await result.user.getIdToken(true);
+
+
             localStorage.setItem("token", token);
-
-            // 🧠 Зберігаємо користувача в БД
-            await fetch(import.meta.env.VITE_API_BASE_URL + "/users/save", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    firebase_uid: result.user.uid,
-                    email: result.user.email,
-                    name: result.user.displayName,
-                    avatarUrl: result.user.photoURL,
-                }),
-            });
-
-            // ✅ Переходимо на головну
             navigate("/");
         } catch (error) {
             console.error("Помилка входу:", error);

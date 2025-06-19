@@ -24,13 +24,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
     const [role, setRole] = useState<string | null>(null);
 
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
+
+
             if (currentUser) {
                 const token = await currentUser.getIdToken();
                 setToken(token);
                 localStorage.setItem("token", token);
+
 
                 try {
                     const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/auth/protected", {
@@ -38,6 +42,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                             Authorization: `Bearer ${token}`,
                         },
                     });
+                    console.log(currentUser);
+
                     const data = await res.json();
                     setRole(data.user.role);
                 } catch (err) {
