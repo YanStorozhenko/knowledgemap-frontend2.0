@@ -60,8 +60,8 @@ export default function ProgressPage() {
                             node.status === "completed"
                                 ? "text-blue-400"
                                 : node.status === "available"
-                                    ? "text-green-400"
-                                    : "text-gray-400"
+                                    ? "text-primary"
+                                    : "text-neutral"
                         }`}
                     >
                         {node.title}

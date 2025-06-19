@@ -10,7 +10,7 @@ export const mobileNavStyle = "md:hidden flex flex-col gap-2 p-4 bg-base-200 rou
 export const headerContainerStyle = "flex items-center justify-between px-4 py-2";
 export const headerWrapperStyle = "bg-base-100 shadow";
 export const titleStyle = "text-lg font-bold text-primary";
-export const logoutButtonStyle = "btn btn-sm bg-pink-400 hover:bg-pink-500 text-white";
+export const logoutButtonStyle = "btn btn-sm bg-blue hover:bg-pink-500 text-white";
 
 // 🔧 Нові стилі для адаптивного блоку користувача
 export const userInfoTextStyle = "text-xs sm:text-sm leading-tight text-right whitespace-nowrap truncate max-w-[150px]";

@@ -50,21 +50,23 @@ module.exports = {
         themes: [
             {
                 light: {
-                    primary: "#4f46e5",
+                    primary: "#0b092c",
+                    primaryContent: "#082f0c",
+
                     secondary: "#d1d5db",
                     accent: "#9333ea",
                     neutral: "#1f2937",
-                    "base-100": "#ffffff",
-                    "info": "#3abff8",
-                    "success": "#36d399",
-                    "warning": "#fbbd23",
-                    "error": "#f87272",
+                    "base-100": "#a1d4eb",
+                    "info": "#2563eb",
+                    "success": "#082516",
+                    "warning": "#ca8a04",
+                    "error": "#dc2626",
                 },
                 dark: {
                     primary: "#22d3ee",
                     secondary: "#64748b",
                     accent: "#8b5cf6",
-                    neutral: "#1e293b",
+                    neutral: "#6d8279",
                     "base-100": "#0f172a",
                     "info": "#0ca5e9",
                     "success": "#2dd4bf",

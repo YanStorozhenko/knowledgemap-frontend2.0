@@ -128,6 +128,7 @@ export default function Navbar() {
                                 await auth.signOut();
                                 localStorage.removeItem("token");
                                 localStorage.removeItem("role");
+
                             }}
                         >
                             Вийти

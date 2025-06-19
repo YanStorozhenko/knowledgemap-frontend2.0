@@ -13,14 +13,12 @@ interface NodeInfoPanelProps {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// 🔹 Класи
-const cardStyle = "card w-72 bg-base-100 shadow-md m-4";
-const bodyStyle = "card-body p-4";
+const cardStyle = "card w-72 max-h-[400px] overflow-y-auto bg-base-100 shadow-md m-4";
+
+const bodyStyle = "card-body min-h-48 p-4";
 const titleStyle = "text-xl font-bold";
-const labelStyle = "font-semibold";
 const descriptionStyle = "text-sm whitespace-pre-wrap";
 const placeholderStyle = "italic text-sm";
-const hrStyle = "my-2";
 
 
 interface NodeInfoPanelProps {
@@ -55,12 +53,16 @@ export default function NodeInfoPanel({ node, onProgressUpdate }: NodeInfoPanelP
 
         fetch(`${API_BASE_URL}/topics/${node.id}`)
             .then((res) => res.json())
-            .then(setTopic)
+            .then((data) => {
+                setTopic(data);
+            })
+            // .then(setTopic)
             .catch(() => setTopic(null));
     }, [node?.id]);
 
+
     const handleMarkAsLearned = async () => {
-        // console.log("▶️ Кнопка натиснута");
+
 
         const token = localStorage.getItem("token");
         if (!node || !token || !currentUserId) {
@@ -74,7 +76,6 @@ export default function NodeInfoPanel({ node, onProgressUpdate }: NodeInfoPanelP
                 status: "completed",
         };
 
-        console.log("📤 Надсилаємо:", payload);
 
         const res = await fetch(`${API_BASE_URL}/progress`, {
             method: "POST",
@@ -85,7 +86,6 @@ export default function NodeInfoPanel({ node, onProgressUpdate }: NodeInfoPanelP
             body: JSON.stringify(payload),
         });
 
-        // 🔍 Додано: обробка помилки
         if (!res.ok) {
             // const text = await res.text();
             // console.error(`❌ Сервер повернув ${res.status}:`, text);
@@ -141,8 +141,6 @@ export default function NodeInfoPanel({ node, onProgressUpdate }: NodeInfoPanelP
                             <p className={descriptionStyle}>{topic.description}</p>
                         )}
 
-                        <hr className={hrStyle} />
-                        <p><span className={labelStyle}>ID:</span> {node.id}</p>
                     </>
                 )}
             </div>
