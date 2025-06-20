@@ -102,6 +102,8 @@ export default function Navbar() {
                 localStorage.setItem("role", data.role);
                 localStorage.setItem("firebaseUser", JSON.stringify(result.user));
             }
+
+            console.log(user);
         } catch (err) {
             console.error("Помилка входу:", err);
         }
