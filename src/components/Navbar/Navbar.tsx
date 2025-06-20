@@ -77,6 +77,9 @@ export default function Navbar() {
             const result = await signInWithPopup(auth, googleProvider);
             const token = await result.user.getIdToken();
             localStorage.setItem("token", token);
+            console.log(token);
+
+
 
             await fetch(import.meta.env.VITE_API_BASE_URL + "/users/save", {
                 method: "POST",
@@ -103,7 +106,7 @@ export default function Navbar() {
                 localStorage.setItem("firebaseUser", JSON.stringify(result.user));
             }
 
-            console.log(user);
+
         } catch (err) {
             console.error("Помилка входу:", err);
         }
