@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                             Authorization: `Bearer ${token}`,
                         },
                     });
-                    console.log(currentUser);
 
                     const data = await res.json();
                     setRole(data.user.role);

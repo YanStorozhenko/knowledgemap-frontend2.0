@@ -132,6 +132,8 @@ export default function AdminPage() {
                                         onChange={(e) => handleRoleChange(u.id, e.target.value)}
                                     >
                                         <option value="user">user</option>
+                                        <option value="student">student</option>
+                                        <option value="teacher">teacher</option>
                                         <option value="admin">admin</option>
                                     </select>
                                 </td>

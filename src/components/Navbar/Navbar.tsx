@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, googleProvider } from "../../firebase";
 import { signInWithPopup, type User } from "firebase/auth";
@@ -37,6 +37,8 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [role, setRole] = useState<string | null>(null);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -65,6 +67,12 @@ export default function Navbar() {
     }, []);
 
     const handleGoogleLogin = async () => {
+
+        console.log('API_BASE_URL', import.meta.env.VITE_API_BASE_URL);
+
+
+
+
         try {
             const result = await signInWithPopup(auth, googleProvider);
             const token = await result.user.getIdToken();
@@ -128,7 +136,7 @@ export default function Navbar() {
                                 await auth.signOut();
                                 localStorage.removeItem("token");
                                 localStorage.removeItem("role");
-
+                                navigate("/");
                             }}
                         >
                             Вийти
